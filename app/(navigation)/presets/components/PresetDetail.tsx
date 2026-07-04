@@ -42,7 +42,6 @@ import { renderSafePromptContent } from "@/utils/sanitizePromptContent";
 import { isTouchDevice } from "../utils/isTouchDevice";
 import { shortenUrl } from "@/utils/common";
 import { toast } from "@/components/toast";
-import { type RaycastImportVersion, useRaycastImportVersion } from "@/app/RaycastFlavor";
 
 type PresetPageProps = {
   preset: Preset;
@@ -59,7 +58,6 @@ export function PresetDetail({ preset, relatedPresets, models, extensions }: Pre
   const modelSupportsImageGen = modelObj?.abilities?.image_generation;
   const router = useRouter();
   const [isTouch, setIsTouch] = React.useState<boolean>();
-  const [raycastImportVersion, setRaycastImportVersion] = useRaycastImportVersion();
 
   const [showToast, setShowToast] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState("");
@@ -84,16 +82,9 @@ export function PresetDetail({ preset, relatedPresets, models, extensions }: Pre
     }
   }, [showToast]);
 
-  const handleAddToRaycast = React.useCallback(
-    (importVersion: RaycastImportVersion = raycastImportVersion) => {
-      if (!isTouch) {
-        setRaycastImportVersion(importVersion);
-      }
-
-      return addToRaycast(router, preset, isTouch, importVersion);
-    },
-    [router, preset, isTouch, raycastImportVersion, setRaycastImportVersion],
-  );
+  const handleAddToRaycast = React.useCallback(() => {
+    return addToRaycast(router, preset, isTouch);
+  }, [router, preset, isTouch]);
 
   const handleCopyInstructions = () => {
     copy(instructions);
@@ -209,7 +200,7 @@ export function PresetDetail({ preset, relatedPresets, models, extensions }: Pre
           <InfoDialog />
           <ButtonGroup>
             <Button variant="primary" onClick={() => handleAddToRaycast()}>
-              <PlusCircleIcon /> Add to Raycast {raycastImportVersion}
+              <PlusCircleIcon /> Add to Raycast
             </Button>
 
             <DropdownMenu open={actionsOpen} onOpenChange={setActionsOpen}>
@@ -219,16 +210,6 @@ export function PresetDetail({ preset, relatedPresets, models, extensions }: Pre
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {raycastImportVersion === "v1" && (
-                  <DropdownMenuItem onSelect={() => handleAddToRaycast("v2")}>
-                    <PlusCircleIcon /> Add to Raycast v2
-                  </DropdownMenuItem>
-                )}
-                {raycastImportVersion === "v2" && (
-                  <DropdownMenuItem onSelect={() => handleAddToRaycast("v1")}>
-                    <PlusCircleIcon /> Add to Raycast v1
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuItem onSelect={() => handleDownload()}>
                   <DownloadIcon /> Download JSON
                   <span className="inline-flex gap-1 items-center ml-auto pl-2">

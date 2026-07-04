@@ -44,7 +44,6 @@ import { Extension } from "@/api/store";
 import { AIExtension } from "@/components/ai-extension";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/tooltip";
 import { renderSafePromptContent } from "@/utils/sanitizePromptContent";
-import { type RaycastImportVersion, useRaycastImportVersion } from "@/app/RaycastFlavor";
 
 export function Shared({ prompts, extensions }: { prompts: Prompt[]; extensions: Extension[] }) {
   const router = useRouter();
@@ -54,7 +53,6 @@ export function Shared({ prompts, extensions }: { prompts: Prompt[]; extensions:
 
   const [selectedPrompts, setSelectedPrompts] = React.useState([...prompts]);
   const isTouch = React.useMemo(() => (typeof window !== "undefined" ? isTouchDevice() : false), []);
-  const [raycastImportVersion, setRaycastImportVersion] = useRaycastImportVersion();
 
   const [isClient, setIsClient] = React.useState(false);
 
@@ -134,16 +132,9 @@ export function Shared({ prompts, extensions }: { prompts: Prompt[]; extensions:
     setCopied(true);
   }, [selectedPrompts]);
 
-  const handleAddToRaycast = React.useCallback(
-    (importVersion: RaycastImportVersion = raycastImportVersion) => {
-      if (!isTouch) {
-        setRaycastImportVersion(importVersion);
-      }
-
-      return addToRaycast(router, selectedPrompts, isTouch, importVersion);
-    },
-    [router, selectedPrompts, isTouch, raycastImportVersion, setRaycastImportVersion],
-  );
+  const handleAddToRaycast = React.useCallback(() => {
+    return addToRaycast(router, selectedPrompts, isTouch);
+  }, [router, selectedPrompts, isTouch]);
 
   const handleCopyText = React.useCallback((prompt: Prompt) => {
     copy(prompt.prompt);
@@ -215,7 +206,7 @@ export function Shared({ prompts, extensions }: { prompts: Prompt[]; extensions:
           <InfoDialog />
           <ButtonGroup>
             <Button variant="primary" disabled={selectedPrompts.length === 0} onClick={() => handleAddToRaycast()}>
-              <PlusCircleIcon /> Add to Raycast {raycastImportVersion}
+              <PlusCircleIcon /> Add to Raycast
             </Button>
 
             <DropdownMenu open={actionsOpen} onOpenChange={setActionsOpen}>
@@ -225,16 +216,6 @@ export function Shared({ prompts, extensions }: { prompts: Prompt[]; extensions:
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {raycastImportVersion === "v1" && (
-                  <DropdownMenuItem disabled={selectedPrompts.length === 0} onSelect={() => handleAddToRaycast("v2")}>
-                    <PlusCircleIcon /> Add to Raycast v2
-                  </DropdownMenuItem>
-                )}
-                {raycastImportVersion === "v2" && (
-                  <DropdownMenuItem disabled={selectedPrompts.length === 0} onSelect={() => handleAddToRaycast("v1")}>
-                    <PlusCircleIcon /> Add to Raycast v1
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuItem disabled={selectedPrompts.length === 0} onSelect={() => handleDownload()}>
                   <DownloadIcon /> Download JSON
                   <Kbds>

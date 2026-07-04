@@ -2,16 +2,11 @@ import copy from "copy-to-clipboard";
 import { Quicklink } from "../quicklinks";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { BASE_URL } from "@/utils/common";
-import {
-  getRaycastFlavor,
-  getIsWindows,
-  setRaycastImportVersion,
-  type RaycastImportVersion,
-} from "@/app/RaycastFlavor";
+import { getRaycastFlavor, getIsRaycastV2 } from "@/app/RaycastFlavor";
 
-function getRaycastIconName(iconName?: string, isWindows?: boolean) {
+function getRaycastIconName(iconName?: string, isRaycastV2?: boolean) {
   if (iconName) {
-    return isWindows ? iconName : `${iconName}-16`;
+    return isRaycastV2 ? iconName : `${iconName}-16`;
   }
   return undefined;
 }
@@ -79,27 +74,18 @@ export function copyUrl(quicklinks: Quicklink[]) {
   copy(makeUrl(quicklinks));
 }
 
-export async function addToRaycast(
-  router: AppRouterInstance,
-  quicklinks: Quicklink[],
-  isTouch?: boolean,
-  importVersion?: RaycastImportVersion,
-) {
+export async function addToRaycast(router: AppRouterInstance, quicklinks: Quicklink[], isTouch?: boolean) {
   // For mobile, always use the standard 'raycast' scheme since iOS apps
   // are typically registered for 'raycast://' not 'raycastinternal://'
   if (isTouch) {
     const quicklinksForImport = withRaycastProtocol(quicklinks, "raycast");
     window.location.href = `raycast://quicklinks/import?${makeQueryString(quicklinksForImport, true)}`;
   } else {
-    if (importVersion) {
-      setRaycastImportVersion(importVersion);
-    }
-
-    const raycastProtocol = await getRaycastFlavor(importVersion);
-    const isWindows = await getIsWindows(importVersion);
+    const raycastProtocol = await getRaycastFlavor();
+    const isRaycastV2 = await getIsRaycastV2();
     const quicklinksForImport = withRaycastProtocol(quicklinks, raycastProtocol);
 
-    if (isWindows) {
+    if (isRaycastV2) {
       const context = encodeURIComponent(
         JSON.stringify(
           quicklinksForImport.map(({ name, link, openWith, icon }) => ({
@@ -117,28 +103,20 @@ export async function addToRaycast(
   }
 }
 
-export async function addQuicklinkToRaycast(
-  router: AppRouterInstance,
-  quicklink: Quicklink,
-  importVersion?: RaycastImportVersion,
-) {
-  if (importVersion) {
-    setRaycastImportVersion(importVersion);
-  }
-
-  const raycastProtocol = await getRaycastFlavor(importVersion);
-  const isWindows = await getIsWindows(importVersion);
+export async function addQuicklinkToRaycast(router: AppRouterInstance, quicklink: Quicklink) {
+  const raycastProtocol = await getRaycastFlavor();
+  const isRaycastV2 = await getIsRaycastV2();
   const [{ name, link, openWith, icon }] = withRaycastProtocol([quicklink], raycastProtocol);
   const encodedQuicklink = encodeURIComponent(
     JSON.stringify({
       name,
       link,
       openWith,
-      icon: getRaycastIconName(icon?.name, isWindows),
+      icon: getRaycastIconName(icon?.name, isRaycastV2),
     }),
   );
 
-  if (isWindows) {
+  if (isRaycastV2) {
     router.replace(`${raycastProtocol}://extensions/raycast/quicklinks/create-quicklink?context=${encodedQuicklink}`);
   } else {
     router.replace(`${raycastProtocol}://extensions/raycast/raycast/create-quicklink?context=${encodedQuicklink}`);
