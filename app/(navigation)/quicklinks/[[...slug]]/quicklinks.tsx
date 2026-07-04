@@ -33,7 +33,7 @@ import { QuicklinkComponent } from "../components/quicklink";
 import { shortenUrl } from "@/utils/common";
 import { toast } from "@/components/toast";
 import { Input, InputSlot } from "@/components/input";
-import { getRaycastFlavor, type RaycastImportVersion, useRaycastImportVersion } from "@/app/RaycastFlavor";
+import { getRaycastFlavor } from "@/app/RaycastFlavor";
 
 function withRaycastProtocol(link: string, protocol: string) {
   if (!protocol) return link;
@@ -94,15 +94,14 @@ export function Quicklinks() {
 
   const [actionsOpen, setActionsOpen] = React.useState(false);
   const [isTouch, setIsTouch] = React.useState<boolean>();
-  const [raycastImportVersion, setRaycastImportVersion] = useRaycastImportVersion();
 
   React.useEffect(() => {
     async function fetchRaycastProtocol() {
-      const protocol = await getRaycastFlavor(raycastImportVersion);
+      const protocol = await getRaycastFlavor();
       setRaycastProtocol(protocol);
     }
     fetchRaycastProtocol();
-  }, [raycastImportVersion]);
+  }, []);
 
   const onStart = ({ event, selection }: SelectionEvent) => {
     if (!isTouch && !event?.ctrlKey && !event?.metaKey) {
@@ -166,16 +165,9 @@ export function Quicklinks() {
     );
   }, [selectedQuicklinks]);
 
-  const handleAddToRaycast = React.useCallback(
-    (importVersion: RaycastImportVersion = raycastImportVersion) => {
-      if (!isTouch) {
-        setRaycastImportVersion(importVersion);
-      }
-
-      return addToRaycast(router, selectedQuicklinks, isTouch, importVersion);
-    },
-    [router, selectedQuicklinks, isTouch, raycastImportVersion, setRaycastImportVersion],
-  );
+  const handleAddToRaycast = React.useCallback(() => {
+    return addToRaycast(router, selectedQuicklinks, isTouch);
+  }, [router, selectedQuicklinks, isTouch]);
 
   React.useEffect(() => {
     setIsTouch(isTouchDevice());
@@ -241,7 +233,7 @@ export function Quicklinks() {
           <InfoDialog />
           <ButtonGroup>
             <Button variant="primary" disabled={selectedQuicklinks.length === 0} onClick={() => handleAddToRaycast()}>
-              <PlusCircleIcon /> Add to Raycast {raycastImportVersion}
+              <PlusCircleIcon /> Add to Raycast
             </Button>
 
             <DropdownMenu open={actionsOpen} onOpenChange={setActionsOpen}>
@@ -251,22 +243,6 @@ export function Quicklinks() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {raycastImportVersion === "v1" && (
-                  <DropdownMenuItem
-                    disabled={selectedQuicklinks.length === 0}
-                    onSelect={() => handleAddToRaycast("v2")}
-                  >
-                    <PlusCircleIcon /> Add to Raycast v2
-                  </DropdownMenuItem>
-                )}
-                {raycastImportVersion === "v2" && (
-                  <DropdownMenuItem
-                    disabled={selectedQuicklinks.length === 0}
-                    onSelect={() => handleAddToRaycast("v1")}
-                  >
-                    <PlusCircleIcon /> Add to Raycast v1
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuItem disabled={selectedQuicklinks.length === 0} onSelect={() => handleDownload()}>
                   <DownloadIcon /> Download JSON
                   <Kbds>
@@ -367,7 +343,7 @@ export function Quicklinks() {
 
                     <div className={styles.summaryControls}>
                       <Button onClick={() => handleAddToRaycast()} variant="primary">
-                        Add to Raycast {raycastImportVersion}
+                        Add to Raycast
                       </Button>
 
                       <Button onClick={() => setSelectedQuicklinkIds([])}>Clear selected</Button>

@@ -10,12 +10,7 @@ import { Toast, ToastTitle } from "../components/Toast";
 import { ScrollArea } from "@/components/scroll-area";
 import { Button } from "@/components/button";
 import { isTouchDevice } from "../utils/isTouchDevice";
-import {
-  getRaycastFlavor,
-  getIsWindows,
-  type RaycastImportVersion,
-  useRaycastImportVersion,
-} from "@/app/RaycastFlavor";
+import { getRaycastFlavor, getIsRaycastV2 } from "@/app/RaycastFlavor";
 import styles from "../[[...slug]]/snippets.module.css";
 import { ChevronDownIcon, CopyClipboardIcon, DownloadIcon, PlusCircleIcon } from "@raycast/icons";
 import { extractSnippets } from "../utils/extractSnippets";
@@ -33,7 +28,6 @@ export function Shared({ snippets }: { snippets: Snippet[] }) {
 
   const [selectedSnippets, setSelectedSnippets] = React.useState([...snippets]);
   const isTouch = React.useMemo(() => (typeof window !== "undefined" ? isTouchDevice() : false), []);
-  const [raycastImportVersion, setRaycastImportVersion] = useRaycastImportVersion();
 
   let gridCols = 1;
   switch (snippets.length) {
@@ -126,11 +120,31 @@ export function Shared({ snippets }: { snippets: Snippet[] }) {
     setCopied(true);
   }, [makeSnippetImportData]);
 
-  const handleAddToRaycast = React.useCallback(
-    async (importVersion: RaycastImportVersion = raycastImportVersion) => {
-      // For mobile, always use the standard 'raycast' scheme since iOS apps
-      // are typically registered for 'raycast://' not 'raycastinternal://'
-      if (isTouch) {
+  const handleAddToRaycast = React.useCallback(async () => {
+    // For mobile, always use the standard 'raycast' scheme since iOS apps
+    // are typically registered for 'raycast://' not 'raycastinternal://'
+    if (isTouch) {
+      const queryString = selectedSnippets
+        .map((snippet) => {
+          const { name, text, type } = snippet;
+          const keyword = snippet.keyword;
+          return `snippet=${encodeURIComponent(JSON.stringify({ name, text, keyword, type }))}`;
+        })
+        .join("&");
+      const url = `raycast://snippets/import?${queryString}`;
+      window.location.href = url;
+    } else {
+      const raycastProtocol = await getRaycastFlavor();
+      const isRaycastV2 = await getIsRaycastV2();
+
+      if (isRaycastV2) {
+        const snippetsData = selectedSnippets.map((snippet) => {
+          const { name, text, keyword, type } = snippet;
+          return { name, text, keyword, type };
+        });
+        const context = encodeURIComponent(JSON.stringify(snippetsData));
+        router.replace(`${raycastProtocol}://extensions/raycast/snippets/import-snippets?context=${context}`);
+      } else {
         const queryString = selectedSnippets
           .map((snippet) => {
             const { name, text, type } = snippet;
@@ -138,35 +152,10 @@ export function Shared({ snippets }: { snippets: Snippet[] }) {
             return `snippet=${encodeURIComponent(JSON.stringify({ name, text, keyword, type }))}`;
           })
           .join("&");
-        const url = `raycast://snippets/import?${queryString}`;
-        window.location.href = url;
-      } else {
-        setRaycastImportVersion(importVersion);
-
-        const raycastProtocol = await getRaycastFlavor(importVersion);
-        const isWindows = await getIsWindows(importVersion);
-
-        if (isWindows) {
-          const snippetsData = selectedSnippets.map((snippet) => {
-            const { name, text, keyword, type } = snippet;
-            return { name, text, keyword, type };
-          });
-          const context = encodeURIComponent(JSON.stringify(snippetsData));
-          router.replace(`${raycastProtocol}://extensions/raycast/snippets/import-snippets?context=${context}`);
-        } else {
-          const queryString = selectedSnippets
-            .map((snippet) => {
-              const { name, text, type } = snippet;
-              const keyword = snippet.keyword;
-              return `snippet=${encodeURIComponent(JSON.stringify({ name, text, keyword, type }))}`;
-            })
-            .join("&");
-          router.replace(`${raycastProtocol}://snippets/import?${queryString}`);
-        }
+        router.replace(`${raycastProtocol}://snippets/import?${queryString}`);
       }
-    },
-    [router, selectedSnippets, isTouch, raycastImportVersion, setRaycastImportVersion],
-  );
+    }
+  }, [router, selectedSnippets, isTouch]);
 
   React.useEffect(() => {
     const down = (event: KeyboardEvent) => {
@@ -229,7 +218,7 @@ export function Shared({ snippets }: { snippets: Snippet[] }) {
             <InfoDialog />
             <ButtonGroup>
               <Button variant="primary" disabled={selectedSnippets.length === 0} onClick={() => handleAddToRaycast()}>
-                <PlusCircleIcon /> Add to Raycast {raycastImportVersion}
+                <PlusCircleIcon /> Add to Raycast
               </Button>
 
               <DropdownMenu open={actionsOpen} onOpenChange={setActionsOpen}>
@@ -239,22 +228,6 @@ export function Shared({ snippets }: { snippets: Snippet[] }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {raycastImportVersion === "v1" && (
-                    <DropdownMenuItem
-                      disabled={selectedSnippets.length === 0}
-                      onSelect={() => handleAddToRaycast("v2")}
-                    >
-                      <PlusCircleIcon /> Add to Raycast v2
-                    </DropdownMenuItem>
-                  )}
-                  {raycastImportVersion === "v2" && (
-                    <DropdownMenuItem
-                      disabled={selectedSnippets.length === 0}
-                      onSelect={() => handleAddToRaycast("v1")}
-                    >
-                      <PlusCircleIcon /> Add to Raycast v1
-                    </DropdownMenuItem>
-                  )}
                   <DropdownMenuItem disabled={selectedSnippets.length === 0} onSelect={() => handleDownload()}>
                     <DownloadIcon /> Download JSON
                     <Kbds>
