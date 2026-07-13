@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import { useAtom, useAtomValue } from "jotai";
-import React from "react";
 
 import { fileNameAtom, showBackgroundAtom } from "../../store";
 import { paddingAtom } from "../../store/padding";
@@ -9,6 +8,8 @@ import { themeDarkModeAtom } from "../../store/themes";
 import Editor from "../Editor";
 import sharedStyles from "./DefaultFrame.module.css";
 import styles from "./BrowserbaseFrame.module.css";
+
+const BACKGROUND_CELL_COUNT = 48;
 
 const BrowserbaseFrame = () => {
   const darkMode = useAtomValue(themeDarkModeAtom);
@@ -29,24 +30,22 @@ const BrowserbaseFrame = () => {
     >
       {!showBackground && <div data-ignore-in-export className={sharedStyles.transparentPattern}></div>}
       {showBackground && (
-        <div className={styles.background}>
-          <div className={styles.backgroundGridline}></div>
-          <div className={styles.backgroundGridline}></div>
-          <div className={styles.backgroundGridline}></div>
-          <div className={styles.backgroundGridline}></div>
-          <div className={styles.backgroundGridline}></div>
-          <div className={styles.backgroundGridline}></div>
-          <div className={styles.backgroundGridline}></div>
+        <div className={styles.background} aria-hidden="true">
+          {Array.from({ length: BACKGROUND_CELL_COUNT }, (_, index) => (
+            <div className={styles.backgroundCell} key={index}>
+              <div className={styles.backgroundShape}></div>
+            </div>
+          ))}
         </div>
       )}
       <div className={styles.window}>
         <div className={classNames(sharedStyles.header, styles.header)}>
           <div className={sharedStyles.controls}>
-            <div className={sharedStyles.control}></div>
-            <div className={sharedStyles.control}></div>
-            <div className={sharedStyles.control}></div>
+            <div className={classNames(sharedStyles.control, styles.control)}></div>
+            <div className={classNames(sharedStyles.control, styles.control)}></div>
+            <div className={classNames(sharedStyles.control, styles.control)}></div>
           </div>
-          <div className={sharedStyles.fileName}>
+          <div className={classNames(sharedStyles.fileName, styles.fileName)}>
             <input
               type="text"
               value={fileName}
@@ -60,7 +59,6 @@ const BrowserbaseFrame = () => {
         </div>
         <Editor />
       </div>
-      <div className={styles.outline} style={{ "--padding": `${padding}px` } as React.CSSProperties}></div>
     </div>
   );
 };
