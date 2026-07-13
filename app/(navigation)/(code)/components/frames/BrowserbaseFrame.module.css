@@ -34,7 +34,7 @@
 .window {
   position: relative;
   z-index: 1;
-  border: 2px solid rgba(197, 211, 232, 0.16);
+  border: 1px solid rgba(197, 211, 232, 0.16);
   background: #0f0f0f;
 
   .header {
