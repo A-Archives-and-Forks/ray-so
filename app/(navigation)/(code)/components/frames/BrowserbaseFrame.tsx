@@ -9,8 +9,8 @@ import Editor from "../Editor";
 import sharedStyles from "./DefaultFrame.module.css";
 import styles from "./BrowserbaseFrame.module.css";
 
-const VERTICAL_GRID_POSITIONS = ["12.5%", "25%", "37.5%", "50%", "62.5%", "75%", "87.5%"];
-const HORIZONTAL_GRID_POSITIONS = ["25%", "50%", "75%"];
+const VERTICAL_GRID_POSITIONS = [12.5, 25, 37.5, 50, 62.5, 75, 87.5];
+const HORIZONTAL_GRID_POSITIONS = [25, 50, 75];
 
 const BrowserbaseFrame = () => {
   const darkMode = useAtomValue(themeDarkModeAtom);
@@ -32,18 +32,18 @@ const BrowserbaseFrame = () => {
       {!showBackground && <div data-ignore-in-export className={sharedStyles.transparentPattern}></div>}
       {showBackground && (
         <div className={styles.background} aria-hidden="true">
-          {VERTICAL_GRID_POSITIONS.map((left) => (
+          {VERTICAL_GRID_POSITIONS.map((position) => (
             <div
               className={classNames(styles.backgroundGridline, styles.backgroundGridlineVertical)}
-              key={left}
-              style={{ left }}
+              key={position}
+              style={{ left: `${position}%` }}
             ></div>
           ))}
-          {HORIZONTAL_GRID_POSITIONS.map((top) => (
+          {HORIZONTAL_GRID_POSITIONS.map((position) => (
             <div
               className={classNames(styles.backgroundGridline, styles.backgroundGridlineHorizontal)}
-              key={top}
-              style={{ top }}
+              key={position}
+              style={{ top: `${position}%` }}
             ></div>
           ))}
         </div>

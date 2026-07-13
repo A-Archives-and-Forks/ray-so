@@ -13,19 +13,22 @@
 
 .backgroundGridline {
   position: absolute;
-  background-color: rgba(197, 211, 232, 0.12);
+  border-style: solid;
+  border-color: rgba(197, 211, 232, 0.12);
 }
 
 .backgroundGridlineVertical {
   top: 0;
   bottom: 0;
-  width: 1px;
+  width: 0;
+  border-width: 0 0 0 1px;
 }
 
 .backgroundGridlineHorizontal {
   right: 0;
   left: 0;
-  height: 1px;
+  height: 0;
+  border-width: 1px 0 0;
 }
 
 .window {
@@ -70,7 +73,7 @@
   }
 
   .backgroundGridline {
-    background-color: rgba(70, 99, 159, 0.16);
+    border-color: rgba(70, 99, 159, 0.08);
   }
 
   .fileName {
