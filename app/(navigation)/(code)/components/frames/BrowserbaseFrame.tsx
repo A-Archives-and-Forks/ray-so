@@ -9,8 +9,17 @@ import Editor from "../Editor";
 import sharedStyles from "./DefaultFrame.module.css";
 import styles from "./BrowserbaseFrame.module.css";
 
-const VERTICAL_GRID_POSITIONS = [12.5, 25, 37.5, 50, 62.5, 75, 87.5];
-const HORIZONTAL_GRID_POSITIONS = [25, 50, 75];
+const VERTICAL_GRID_SEGMENTS = [0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1];
+const HORIZONTAL_GRID_SEGMENTS = [0, 0.5, 1];
+
+const getInsetGridPosition = (segment: number, padding: number) => {
+  const percentage = Number((segment * 100).toFixed(4));
+  const offset = Number((padding * (1 - 2 * segment)).toFixed(4));
+
+  if (offset === 0) return `${percentage}%`;
+
+  return `calc(${percentage}% ${offset > 0 ? "+" : "-"} ${Math.abs(offset)}px)`;
+};
 
 const BrowserbaseFrame = () => {
   const darkMode = useAtomValue(themeDarkModeAtom);
@@ -32,18 +41,18 @@ const BrowserbaseFrame = () => {
       {!showBackground && <div data-ignore-in-export className={sharedStyles.transparentPattern}></div>}
       {showBackground && (
         <div className={styles.background} aria-hidden="true">
-          {VERTICAL_GRID_POSITIONS.map((position) => (
+          {VERTICAL_GRID_SEGMENTS.map((segment) => (
             <div
               className={classNames(styles.backgroundGridline, styles.backgroundGridlineVertical)}
-              key={position}
-              style={{ left: `${position}%` }}
+              key={segment}
+              style={{ left: getInsetGridPosition(segment, padding) }}
             ></div>
           ))}
-          {HORIZONTAL_GRID_POSITIONS.map((position) => (
+          {HORIZONTAL_GRID_SEGMENTS.map((segment) => (
             <div
               className={classNames(styles.backgroundGridline, styles.backgroundGridlineHorizontal)}
-              key={position}
-              style={{ top: `${position}%` }}
+              key={segment}
+              style={{ top: getInsetGridPosition(segment, padding) }}
             ></div>
           ))}
         </div>

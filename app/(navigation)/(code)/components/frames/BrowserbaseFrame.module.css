@@ -22,6 +22,7 @@
   bottom: 0;
   width: 0;
   border-width: 0 0 0 1px;
+  transition: left 200ms;
 }
 
 .backgroundGridlineHorizontal {
@@ -29,6 +30,7 @@
   left: 0;
   height: 0;
   border-width: 1px 0 0;
+  transition: top 200ms;
 }
 
 .window {

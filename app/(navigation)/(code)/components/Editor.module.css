@@ -130,6 +130,11 @@
   font-family: inherit;
 }
 
+:global(.browserbase-environment-variable),
+:global(.browserbase-environment-variable) * {
+  color: var(--ray-token-property) !important;
+}
+
 .plainText {
   color: var(--ray-foreground);
 }

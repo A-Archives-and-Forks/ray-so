@@ -5,7 +5,7 @@ import { Language, LANGUAGES } from "../util/languages";
 import styles from "./Editor.module.css";
 import { highlightedLinesAtom, highlighterAtom, loadingLanguageAtom } from "../store";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { themeDarkModeAtom, themeAtom } from "../store/themes";
+import { THEMES, themeDarkModeAtom, themeAtom } from "../store/themes";
 
 type PropTypes = {
   selectedLanguage: Language | null;
@@ -41,9 +41,24 @@ const HighlightedCode: React.FC<PropTypes> = ({ selectedLanguage, code }) => {
         lang = "tsx";
       }
 
+      const decorations =
+        theme.id === THEMES.browserbase.id
+          ? Array.from(code.matchAll(/\bprocess\.env\.([A-Za-z_$][\w$]*)/g), (match) => {
+              const start = match.index + "process.env.".length;
+
+              return {
+                start,
+                end: start + match[1].length,
+                alwaysWrap: true,
+                properties: { class: "browserbase-environment-variable" },
+              };
+            })
+          : [];
+
       return highlighter.codeToHtml(code, {
         lang: lang,
         theme: themeName,
+        decorations,
         transformers: [
           {
             line(node, line) {
@@ -58,7 +73,16 @@ const HighlightedCode: React.FC<PropTypes> = ({ selectedLanguage, code }) => {
     generateHighlightedHtml().then((newHtml) => {
       setHighlightedHtml(newHtml);
     });
-  }, [code, selectedLanguage, highlighter, setIsLoadingLanguage, setHighlightedHtml, highlightedLines, themeName]);
+  }, [
+    code,
+    selectedLanguage,
+    highlighter,
+    setIsLoadingLanguage,
+    setHighlightedHtml,
+    highlightedLines,
+    theme.id,
+    themeName,
+  ]);
 
   return (
     <div
