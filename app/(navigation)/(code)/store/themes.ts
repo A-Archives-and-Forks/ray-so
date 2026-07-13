@@ -702,7 +702,7 @@ export const THEMES: { [index: string]: Theme } = {
     name: "Browserbase",
     background: {
       from: "#FF4500",
-      to: "#FF4500",
+      to: "#000000",
     },
     icon: BrowserbaseLogo,
     iconUrl: BrowserbaseLogoUrl,

@@ -9,7 +9,8 @@ import Editor from "../Editor";
 import sharedStyles from "./DefaultFrame.module.css";
 import styles from "./BrowserbaseFrame.module.css";
 
-const BACKGROUND_CELL_COUNT = 48;
+const VERTICAL_GRID_POSITIONS = ["5%", "20%", "35%", "50%", "65%", "80%", "95%"];
+const HORIZONTAL_GRID_POSITIONS = ["25%", "50%", "75%"];
 
 const BrowserbaseFrame = () => {
   const darkMode = useAtomValue(themeDarkModeAtom);
@@ -31,19 +32,28 @@ const BrowserbaseFrame = () => {
       {!showBackground && <div data-ignore-in-export className={sharedStyles.transparentPattern}></div>}
       {showBackground && (
         <div className={styles.background} aria-hidden="true">
-          {Array.from({ length: BACKGROUND_CELL_COUNT }, (_, index) => (
-            <div className={styles.backgroundCell} key={index}>
-              <div className={styles.backgroundShape}></div>
-            </div>
+          {VERTICAL_GRID_POSITIONS.map((left) => (
+            <div
+              className={classNames(styles.backgroundGridline, styles.backgroundGridlineVertical)}
+              key={left}
+              style={{ left }}
+            ></div>
+          ))}
+          {HORIZONTAL_GRID_POSITIONS.map((top) => (
+            <div
+              className={classNames(styles.backgroundGridline, styles.backgroundGridlineHorizontal)}
+              key={top}
+              style={{ top }}
+            ></div>
           ))}
         </div>
       )}
       <div className={styles.window}>
         <div className={classNames(sharedStyles.header, styles.header)}>
           <div className={sharedStyles.controls}>
-            <div className={classNames(sharedStyles.control, styles.control)}></div>
-            <div className={classNames(sharedStyles.control, styles.control)}></div>
-            <div className={classNames(sharedStyles.control, styles.control)}></div>
+            <div className={sharedStyles.control}></div>
+            <div className={sharedStyles.control}></div>
+            <div className={sharedStyles.control}></div>
           </div>
           <div className={classNames(sharedStyles.fileName, styles.fileName)}>
             <input

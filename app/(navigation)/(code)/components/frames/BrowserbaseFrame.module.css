@@ -1,95 +1,50 @@
 .frame {
   position: relative;
-  overflow: hidden;
   height: 100%;
-  background-color: #ff4500;
+  background-color: #000000;
 }
 
 .background {
   position: absolute;
   z-index: 0;
-  display: grid;
-  overflow: hidden;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  grid-template-rows: repeat(6, minmax(0, 1fr));
   inset: 0;
   pointer-events: none;
 }
 
-.backgroundCell {
-  display: grid;
-  min-width: 0;
-  border-right: 1px solid rgba(0, 0, 0, 0.24);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.24);
-  place-items: center;
-
-  &:nth-child(4n + 2) {
-    background-color: #c5d3e8;
-  }
-
-  &:nth-child(8n + 5) {
-    background-color: #000000;
-  }
+.backgroundGridline {
+  position: absolute;
+  background-color: rgba(197, 211, 232, 0.12);
 }
 
-.backgroundShape {
-  width: 42%;
-  max-width: 42px;
-  aspect-ratio: 1;
-  background-color: #000000;
+.backgroundGridlineVertical {
+  top: 0;
+  bottom: 0;
+  width: 1px;
 }
 
-.backgroundCell:nth-child(3n) .backgroundShape {
-  border-radius: 50%;
-}
-
-.backgroundCell:nth-child(5n) .backgroundShape {
-  background-color: #ffffff;
-}
-
-.backgroundCell:nth-child(7n) .backgroundShape {
-  background-color: #c4d600;
-}
-
-.backgroundCell:nth-child(11n) .backgroundShape {
-  background-color: #00cb51;
-}
-
-.backgroundCell:nth-child(13n) .backgroundShape {
-  background-color: #00b0ff;
-}
-
-.backgroundCell:nth-child(17n) .backgroundShape {
-  background-color: #ff00ff;
-}
-
-.backgroundCell:nth-child(8n + 5) .backgroundShape {
-  background-color: #ffffff;
+.backgroundGridlineHorizontal {
+  right: 0;
+  left: 0;
+  height: 1px;
 }
 
 .window {
   position: relative;
   z-index: 1;
-  overflow: hidden;
-  padding-top: 0;
-  border: 2px solid #000000;
-  border-radius: 0;
-  background: #000000;
-  box-shadow: 10px 10px 0 #000000;
+  border: 2px solid rgba(197, 211, 232, 0.16);
+  background: #0f0f0f;
 
   .header {
-    height: 40px;
-    padding: 0 14px;
-    border-bottom: 2px solid #000000;
-    background-color: #c5d3e8;
+    height: 30px;
+    padding-top: 10px;
   }
 
   .fileName {
     height: 24px;
-    color: #000000;
+    color: #ffffff;
     font-family: var(--font-space-mono), monospace;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 24px;
 
     > input,
@@ -101,47 +56,32 @@
     }
 
     & > span {
-      color: rgba(0, 0, 0, 0.55);
+      color: rgba(255, 255, 255, 0.6);
     }
   }
 }
 
-.control {
-  width: 14px;
-  height: 14px;
-  border: 2px solid #000000;
-  border-radius: 50%;
-  background-color: #ff4500;
-
-  &:nth-child(2) {
-    border-radius: 0;
-    background-color: #c4d600;
-  }
-
-  &:nth-child(3) {
-    background-color: #00b0ff;
-  }
-}
-
 .frameLightMode {
+  background: #f8fafc;
+
   .window {
+    border-color: rgba(70, 99, 159, 0.24);
     background: #ffffff;
   }
 
+  .backgroundGridline {
+    background-color: rgba(70, 99, 159, 0.16);
+  }
+
   .fileName {
-    color: #000000;
+    color: rgba(0, 0, 0, 0.6);
 
     & > span {
-      color: rgba(0, 0, 0, 0.55);
+      color: rgba(0, 0, 0, 0.6);
     }
   }
 }
 
 .noBackground {
-  overflow: visible;
   background: transparent;
-
-  .window {
-    box-shadow: none;
-  }
 }
