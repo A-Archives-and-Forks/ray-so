@@ -9,7 +9,7 @@ import Editor from "../Editor";
 import sharedStyles from "./DefaultFrame.module.css";
 import styles from "./BrowserbaseFrame.module.css";
 
-const VERTICAL_GRID_POSITIONS = ["5%", "20%", "35%", "50%", "65%", "80%", "95%"];
+const VERTICAL_GRID_POSITIONS = ["12.5%", "25%", "37.5%", "50%", "62.5%", "75%", "87.5%"];
 const HORIZONTAL_GRID_POSITIONS = ["25%", "50%", "75%"];
 
 const BrowserbaseFrame = () => {
