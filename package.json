@@ -91,6 +91,7 @@
     "fast-uri": "3.1.2",
     "lodash": "^4.18.1",
     "lodash-es": "^4.18.1",
-    "postcss": "$postcss"
+    "postcss": "$postcss",
+    "ws": "7.5.11"
   }
 }
