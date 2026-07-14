@@ -49,8 +49,7 @@ const HighlightedCode: React.FC<PropTypes> = ({ selectedLanguage, code }) => {
               return {
                 start,
                 end: start + match[1].length,
-                alwaysWrap: true,
-                properties: { class: "browserbase-environment-variable" },
+                properties: { style: "color: var(--ray-token-property)" },
               };
             })
           : [];
